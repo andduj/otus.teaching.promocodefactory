@@ -30,17 +30,10 @@ namespace Otus.Teaching.PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+        public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync()
         {
             var employees = await _employeeRepository.GetAllAsync();
-
-            return employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
+            return employees.Select(x => (EmployeeShortResponse)x);
         }
         
         /// <summary>
