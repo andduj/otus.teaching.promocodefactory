@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -33,15 +34,13 @@ namespace Otus.Teaching.PromoCodeFactory.WebHost.Controllers
         {
             var employees = await _employeeRepository.GetAllAsync();
 
-            var employeesModelList = employees.Select(x => 
+            return employees.Select(x =>
                 new EmployeeShortResponse()
-                    {
-                        Id = x.Id,
-                        Email = x.Email,
-                        FullName = x.FullName,
-                    }).ToList();
-
-            return employeesModelList;
+                {
+                    Id = x.Id,
+                    Email = x.Email,
+                    FullName = x.FullName,
+                }).ToList();
         }
         
         /// <summary>
@@ -52,24 +51,12 @@ namespace Otus.Teaching.PromoCodeFactory.WebHost.Controllers
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
-
             if (employee == null)
-                return NotFound();
-            
-            var employeeModel = new EmployeeResponse()
             {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
+                return NotFound();
+            }
 
-            return employeeModel;
+            return (EmployeeResponse)employee;
         }
 
         /// <summary>
@@ -77,11 +64,58 @@ namespace Otus.Teaching.PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult> DeleteEmployeeAsync(Guid id)
         {
-            await _employeeRepository.DeleteAsync(id);
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            await _employeeRepository.DeleteAsync(employee);
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Обновление сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult> UpdateEmployeeAsync(Guid id, EmployeeEntities entities)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            employee.Email = entities.Email;
+            employee.FirstName = entities.FirstName;
+            employee.LastName = entities.LastName;
+
+            await _employeeRepository.UpdateAsync(employee);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Добавление сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(EmployeeEntities entities)
+        {
+            var employee = new Employee()
+            {
+                Id = Guid.NewGuid(),
+                Email = entities.Email,
+                FirstName = entities.FirstName,
+                LastName = entities.LastName
+            };
+
+            await _employeeRepository.AddAsync(employee);
+            return (EmployeeResponse)employee;
         }
     }
 }

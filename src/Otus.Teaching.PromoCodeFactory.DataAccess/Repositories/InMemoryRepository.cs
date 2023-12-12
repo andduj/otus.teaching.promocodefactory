@@ -11,7 +11,7 @@ namespace Otus.Teaching.PromoCodeFactory.DataAccess.Repositories
         : IRepository<T>
         where T: BaseEntity
     {
-        protected IList<T> Data { get; set; }
+        protected ICollection<T> Data { get; set; }
 
         public InMemoryRepository(IEnumerable<T> data)
         {
@@ -28,25 +28,27 @@ namespace Otus.Teaching.PromoCodeFactory.DataAccess.Repositories
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
         }
 
-        public Task<T> UpdateAsync()
+        public Task UpdateAsync(T value)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(Guid id)
-        {
-            var item = Data.FirstOrDefault(x => x.Id == id);
-            if(item != null)
+            var item = Data.FirstOrDefault(x => x.Id == value.Id);
+            if (item != null)
             {
                 Data.Remove(item);
+                Data.Add(value);
             }
-
-            return Task.FromResult<T>(null);
+            return Task.CompletedTask;
         }
 
-        public Task<T> CreateAsync()
+        public Task DeleteAsync(T value)
         {
-            throw new NotImplementedException();
+            Data.Remove(value);
+            return Task.CompletedTask;
+        }
+
+        public Task AddAsync(T value)
+        {
+            Data.Add(value);
+            return Task.CompletedTask;
         }
     }
 }

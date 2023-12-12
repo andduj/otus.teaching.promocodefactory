@@ -32,7 +32,7 @@ namespace Otus.Teaching.PromoCodeFactory.DataAccess.Data
                     Roles.FirstOrDefault(x => x.Name == "PartnerManager")  
                 },
                 AppliedPromocodesCount = 10
-            },
+            }
         };
 
         public static IEnumerable<Role> Roles => new List<Role>()
