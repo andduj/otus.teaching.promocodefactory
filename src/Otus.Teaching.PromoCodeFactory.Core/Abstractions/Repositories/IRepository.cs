@@ -11,5 +11,11 @@ namespace Otus.Teaching.PromoCodeFactory.Core.Abstractions.Repositories
         Task<IEnumerable<T>> GetAllAsync();
         
         Task<T> GetByIdAsync(Guid id);
+
+        Task<T> UpdateAsync();
+
+        Task DeleteAsync(Guid id);
+
+        Task<T> CreateAsync();
     }
 }

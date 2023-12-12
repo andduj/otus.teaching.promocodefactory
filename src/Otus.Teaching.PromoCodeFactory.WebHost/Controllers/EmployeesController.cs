@@ -71,5 +71,17 @@ namespace Otus.Teaching.PromoCodeFactory.WebHost.Controllers
 
             return employeeModel;
         }
+
+        /// <summary>
+        /// Удаление сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteEmployeeByIdAsync(Guid id)
+        {
+            await _employeeRepository.DeleteAsync(id);
+
+            return Ok();
+        }
     }
 }
